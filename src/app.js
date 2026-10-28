@@ -1,3 +1,5 @@
+require("dotenv").config({ path: `.env.${process.env.NODE_ENV}` });
+
 const express = require("express");
 const helmet = require("helmet");
 const morgan = require("morgan");
@@ -6,10 +8,9 @@ const compression = require("compression");
 const rateLimit = require("express-rate-limit");
 
 const errorHandler = require("./middlewares/errorHandler");
-//const beerRoutes = require('./routes/beerRoutes');
-
-process.env.NODE_ENV = process.env.NODE_ENV || "development";
-require("dotenv").config({ path: `.env.${process.env.NODE_ENV}` });
+const beerRoutes = require("./routes/beerRoutes");
+const authRoutes = require("./routes/authRoutes");
+const userRoutes = require("./routes/userRoutes");
 
 const app = express();
 
@@ -32,7 +33,9 @@ if (process.env.NODE_ENV !== "test") {
 }
 
 // --- RUTAS ---
-// app.use('/api/v1/beers', beerRoutes);
+app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/users", userRoutes);
+app.use("/api/v1/beers", beerRoutes);
 
 // Manejador de rutas no encontradas (404)
 app.use((req, res, next) => {
