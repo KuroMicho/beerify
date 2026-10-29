@@ -20,6 +20,8 @@ app.use(cors()); // Habilitar peticiones de otros dominios
 app.use(express.json({ limit: "10kb" })); // Parsear JSON limitando el tamaño del body
 app.use(compression()); // Comprimir respuestas (GZIP)
 
+app.set("trust proxy", 1);
+
 // Rate Limiting: Previene ataques de fuerza bruta
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutos

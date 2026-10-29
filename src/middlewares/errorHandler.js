@@ -14,12 +14,10 @@ const errorHandler = (err, req, res, next) => {
     err.name === "TokenExpiredError" ||
     err.message === "No autorizado"
   ) {
-    return res
-      .status(401)
-      .json({
-        status: "fail",
-        message: "Token inválido o expirado. Inicia sesión.",
-      });
+    return res.status(401).json({
+      status: "fail",
+      message: "Token inválido o expirado. Inicia sesión.",
+    });
   }
 
   // Error de validación de Mongoose (Datos incorrectos o faltantes)
@@ -42,7 +40,7 @@ const errorHandler = (err, req, res, next) => {
   res.status(statusCode).json({
     status: "error",
     message:
-      process.env.NODE_ENV === "development"
+      process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test"
         ? err.message
         : "Error interno del servidor",
   });

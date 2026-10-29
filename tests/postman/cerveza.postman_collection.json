@@ -1,0 +1,318 @@
+{
+  "info": {
+    "_postman_id": "c5913fc0-9c26-49ea-b01f-2db43bfba13f",
+    "name": "cerveza",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "43848850",
+    "_collection_link": "https://go.postman.co/collection/43848850-c5913fc0-9c26-49ea-b01f-2db43bfba13f?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "utils",
+      "item": [
+        {
+          "name": "DROP DB",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{url_base}}/{{api_version}}/auth/clean-database",
+              "host": [
+                "{{url_base}}"
+              ],
+              "path": [
+                "{{api_version}}",
+                "auth",
+                "clean-database"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "auth",
+      "item": [
+        {
+          "name": "REGISTER [public]",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"El tiempo de respuesta es menor a 600ms\", function () {\r\n    pm.expect(pm.response.responseTime).to.be.below(600);\r\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"admin@cerveceria.com\",\r\n    \"name\": \"admin123\",\r\n    \"password\": \"12345678\",\r\n    \"role\": \"admin\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_base}}/{{api_version}}/auth/register",
+              "host": [
+                "{{url_base}}"
+              ],
+              "path": [
+                "{{api_version}}",
+                "auth",
+                "register"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "LOGIN [public]",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Validar credenciales y almacenar Token JWT\", function () {\r\n    pm.response.to.have.status(200);\r\n    var jsonData = pm.response.json();\r\n    pm.environment.set(\"jwt_token\", jsonData.token);\r\n});\r\n\r\npm.test(\"El tiempo de respuesta es menor a 600ms\", function () {\r\n    pm.expect(pm.response.responseTime).to.be.below(600);\r\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"admin@cerveceria.com\",\r\n    \"password\":  \"12345678\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_base}}/{{api_version}}/auth/login",
+              "host": [
+                "{{url_base}}"
+              ],
+              "path": [
+                "{{api_version}}",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "beers",
+      "item": [
+        {
+          "name": "POST BEER [admin]",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Validar estructura del producto creado\", function () {\n    var jsonData = pm.response.json();\n    pm.expect(jsonData).to.have.property(\"status\", \"success\");\n    pm.expect(jsonData).to.have.property(\"data\");\n    pm.expect(jsonData.data).to.have.property(\"name\");\n    pm.expect(jsonData.data).to.have.property(\"_id\");\n});\n\npm.test(\"Status code is 201\", function () {\n    pm.response.to.have.status(201);\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "{{$randomAlphaNumeric}}",
+                  "type": "text"
+                },
+                {
+                  "key": "style",
+                  "value": "{{$randomNamePrefix}}",
+                  "type": "text"
+                },
+                {
+                  "key": "abv",
+                  "value": "999",
+                  "type": "text"
+                },
+                {
+                  "key": "price",
+                  "value": "5000",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": [
+                    "/D:/Descargas/157117-800-auto.webp"
+                  ]
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{url_base}}/{{api_version}}/beers",
+              "host": [
+                "{{url_base}}"
+              ],
+              "path": [
+                "{{api_version}}",
+                "beers"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET BEERS [user|admin]",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Validar catálogo de productos\", function () {\r\n    pm.response.to.have.status(200);\r\n    var jsonData = pm.response.json();\r\n    pm.expect(jsonData.status).to.equal(\"success\");\r\n    pm.expect(jsonData.data).to.be.an('array');\r\n});\r\n\r\n"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url_base}}/{{api_version}}/beers",
+              "host": [
+                "{{url_base}}"
+              ],
+              "path": [
+                "{{api_version}}",
+                "beers"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "users",
+      "item": [
+        {
+          "name": "POST PROFILE PICTURE [user|admin]",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const fileField = pm.request.body.formdata.find(p => p.type === 'file');\r\n\r\nif (!fileField || !fileField.src) {\r\n    pm.execution.skipRequest();\r\n    throw new Error(\"❌ Error: Debes adjuntar una imagen en el Body (form-data).\");\r\n}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": [
+                    "/D:/Descargas/2c7d99fe281ecd3bcd65ab915bac6dd5.jpeg"
+                  ]
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{url_base}}/{{api_version}}/users/profile-picture",
+              "host": [
+                "{{url_base}}"
+              ],
+              "path": [
+                "{{api_version}}",
+                "users",
+                "profile-picture"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET USERS [admin]",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url_base}}/{{api_version}}/users",
+              "host": [
+                "{{url_base}}"
+              ],
+              "path": [
+                "{{api_version}}",
+                "users"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
