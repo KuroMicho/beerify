@@ -8,6 +8,20 @@ const errorHandler = (err, req, res, next) => {
     return res.status(404).json({ status: "error", message: err.message });
   }
 
+  // Errores de JWT (Autenticación)
+  if (
+    err.name === "JsonWebTokenError" ||
+    err.name === "TokenExpiredError" ||
+    err.message === "No autorizado"
+  ) {
+    return res
+      .status(401)
+      .json({
+        status: "fail",
+        message: "Token inválido o expirado. Inicia sesión.",
+      });
+  }
+
   // Error de validación de Mongoose (Datos incorrectos o faltantes)
   if (err.name === "ValidationError") {
     const messages = Object.values(err.errors).map((val) => val.message);

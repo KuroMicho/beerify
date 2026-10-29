@@ -1,16 +1,22 @@
-const express = require('express');
-const beerController = require('../controllers/beerController');
-const upload = require('../middlewares/uploadMiddleware');
+const express = require("express");
+const beerController = require("../controllers/beerController");
+const { restrictTo, protect } = require("../middlewares/authMiddleware");
+const upload = require("../middlewares/uploadMiddleware");
 
 const router = express.Router();
 
-router.route('/')
-    .get(beerController.getAll)
-    .post(upload.single('image'), beerController.create);
+// Definición de endpoints CRUD
+router.use(protect);
 
-router.route('/:id')
-    .get(beerController.getById)
-    .put(upload.single('image'), beerController.update)
-    .delete(beerController.remove);
+router
+  .route("/")
+  .get(beerController.getAll)
+  .post(restrictTo("admin"), upload.single("image"), beerController.create);
+
+router
+  .route("/:id")
+  .get(beerController.getById)
+  .put(restrictTo("admin"), upload.single("image"), beerController.update)
+  .delete(restrictTo("admin"), beerController.remove);
 
 module.exports = router;
