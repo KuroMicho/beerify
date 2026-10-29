@@ -46,7 +46,7 @@ jobs:
           JWT_SECRET: super_secret_test
           JWT_EXPIRES_IN: 1d
         run: |
-          npm start &
+          npm run dev &
           sleep 5 # Esperar 5 segundos a que la BD y el servidor inicien
 
       - name: Instalar Newman
