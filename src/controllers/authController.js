@@ -18,6 +18,7 @@ const authController = {
     res.status(200).json({
       status: "success",
       token: result.token,
+      user: result.user,
     });
   }),
 };

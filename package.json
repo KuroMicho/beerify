@@ -6,7 +6,10 @@
   "scripts": {
     "start": "cross-env NODE_ENV=production node src/server.js",
     "dev": "cross-env NODE_ENV=development nodemon src/server.js",
-    "test": "cross-env NODE_ENV=test jest --runInBand --detectOpenHandles"
+    "test": "cross-env NODE_ENV=test jest --runInBand --detectOpenHandles",
+    "seed:import": "node src/scripts/seed.js --import",
+    "seed:delete": "node src/scripts/seed.js --delete",
+    "seed:reset": "node src/scripts/seed.js --reset"
   },
   "keywords": [],
   "type": "commonjs",

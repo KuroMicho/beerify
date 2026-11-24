@@ -24,4 +24,11 @@ userSchema.methods.correctPassword = async function (candidate, userPassword) {
   return await bcrypt.compare(candidate, userPassword);
 };
 
+userSchema.set("toJSON", {
+  transform: (doc, ret) => {
+    delete ret.password;
+    return ret;
+  },
+});
+
 module.exports = mongoose.model("User", userSchema);
